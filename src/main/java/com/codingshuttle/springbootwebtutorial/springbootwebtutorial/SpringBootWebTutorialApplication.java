@@ -10,4 +10,5 @@ public class SpringBootWebTutorialApplication {
 		SpringApplication.run(SpringBootWebTutorialApplication.class, args);
 	}
 
+
 }
