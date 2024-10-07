@@ -1,6 +1,7 @@
 package com.codingshuttle.springbootwebtutorial.springbootwebtutorial.controllers;
 
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.dto.EmployeeDTO;
+import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.EmployeeEntity;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
@@ -31,16 +32,18 @@ public class EmployeeController {
 
     //    http://localhost:8080/employees?age=23
     @GetMapping
-    public String getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
-        return "Hi age " + inputAge + "  " + sortBy;
+    public List<EmployeeEntity> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
+//        return "Hi age " + inputAge + "  " + sortBy;
+        return employeeRepository.findAll();
     }
 
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee){
+    public EmployeeEntity createNewEmployee(@RequestBody EmployeeEntity inputEmployee){
 //        return "Hello from POST"  , STRING
 //        return null;   // Here not dealing with database
-        inputEmployee.setId(100L);
-        return inputEmployee;
+//        inputEmployee.setId(100L);
+//        return inputEmployee;
+        return employeeRepository.save(inputEmployee);
     }
 
     @PutMapping String updateEmployeeByID(){
