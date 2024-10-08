@@ -5,6 +5,7 @@ import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.Em
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services.EmployeeService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +31,15 @@ public class EmployeeController {
 
 
     @GetMapping("/{employeeId}")
-    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long id) {
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(name = "employeeId") Long id) {
 //        return new EmployeeDTO(id, "Deepak", "deepak@gmail.com", 23, LocalDate.of(2024, 8, 3), true);
 //        return employeeRepository.findById(id).orElse(null);
-        return employeeService.getEmployeeById(id);
+        EmployeeDTO employeeDTO =  employeeService.getEmployeeById(id);
+        // if employeeDTO is null, as said in employeeService
+        // we have two methods  notFound and ok
+        if (employeeDTO == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(employeeDTO);
+
     }
 
     //    http://localhost:8080/employees?age=23
