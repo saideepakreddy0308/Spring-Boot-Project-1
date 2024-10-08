@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/employees")
@@ -34,13 +35,15 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable(name = "employeeId") Long id) {
 //        return new EmployeeDTO(id, "Deepak", "deepak@gmail.com", 23, LocalDate.of(2024, 8, 3), true);
 //        return employeeRepository.findById(id).orElse(null);
-        EmployeeDTO employeeDTO =  employeeService.getEmployeeById(id);
+        Optional<EmployeeDTO> employeeDTO =  employeeService.getEmployeeById(id);
         // if employeeDTO is null, as said in employeeService
         // we have two methods  notFound and ok
-        if (employeeDTO == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(employeeDTO);
-
-    }
+//        if (employeeDTO == null) return ResponseEntity.notFound().build();
+//        return ResponseEntity.ok(employeeDTO);
+        return employeeDTO
+                .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
+                .orElse(ResponseEntity.notFound().build());
+    }  // we get correct status code 404, if not found, rather than 500
 
     //    http://localhost:8080/employees?age=23
     @GetMapping
