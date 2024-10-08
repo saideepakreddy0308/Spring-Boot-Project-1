@@ -5,6 +5,8 @@ import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.Em
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services.EmployeeService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
@@ -47,35 +49,43 @@ public class EmployeeController {
 
     //    http://localhost:8080/employees?age=23
     @GetMapping
-    public List<EmployeeDTO> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
-//        return "Hi age " + inputAge + "  " + sortBy;
-//        return employeeRepository.findAll();
-        return employeeService.getAllEmployees();
+    public ResponseEntity<List<EmployeeDTO>> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     // we need to make sure in controller that we are not using EmployeeEntity
 
 
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
-        return employeeService.createNewEmployee(inputEmployee);
+    public ResponseEntity<EmployeeDTO> createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
+//        return employeeService.createNewEmployee(inputEmployee);
+        // here we need to send some response that it is created successfully
+        EmployeeDTO savedEmployee = employeeService.createNewEmployee(inputEmployee);
+        // here we need to use new keyword, as we need to pass the ResponseEntity
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
     // all  the above three methods are confirming to the MVC architecture
 
     @PutMapping(path = "/{employeeId}")
-    public EmployeeDTO updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId) {
-        return employeeService.updateEmployeeById(employeeId, employeeDTO);  // here, passing the employeeDTO to particular employeeId
+    public ResponseEntity<EmployeeDTO> updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId) {
+        return ResponseEntity.ok(employeeService.updateEmployeeById(employeeId, employeeDTO));  // here, passing the employeeDTO to particular employeeId
     }
 
     @DeleteMapping(path = "/{employeeId}")
-    public void deleteEmployeeByID(@PathVariable Long employeeId) {   // no need to return anything, void or boolean is best
-        employeeService.deleteEmployeeById(employeeId);  // no need of returning anything
+    public ResponseEntity<Boolean> deleteEmployeeByID(@PathVariable Long employeeId) {   // no need to return anything, void or boolean is best
+//        return ResponseEntity.ok(employeeService.deleteEmployeeById(employeeId));  // no need of returning anything
+        boolean gotDeleted = employeeService.deleteEmployeeById(employeeId);
+        if(gotDeleted) return ResponseEntity.ok(true);
+        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping(path = "/{employeeId}")// we cant go for employeeDTO as input, as we really dont know the fields to update.
     // so we instead use a map of string to object
-    public EmployeeDTO updatePartialEmployeeByID (@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
-        return employeeService.updatePartialEmployeeById(employeeId, updates);  // here, passing the updates
+    public ResponseEntity<EmployeeDTO> updatePartialEmployeeByID (@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
+        // here, in the method updatePartial in Service, we are returning null if does not exist.
+        EmployeeDTO employeeDTO =  employeeService.updatePartialEmployeeById(employeeId, updates);  // here, passing the updates
+        if ( employeeDTO == null) return  ResponseEntity.notFound().build();
+        return ResponseEntity.ok(employeeDTO);
         }
     }
