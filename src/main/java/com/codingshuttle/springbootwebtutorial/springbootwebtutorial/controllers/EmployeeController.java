@@ -27,7 +27,7 @@ public class EmployeeController {
 
 
     @GetMapping("/{employeeId}")
-    public EmployeeEntity getEmployeeById(@PathVariable(name = "employeeId") Long id) {
+    public EmployeeDTO getEmployeeById(@PathVariable(name = "employeeId") Long id) {
 //        return new EmployeeDTO(id, "Deepak", "deepak@gmail.com", 23, LocalDate.of(2024, 8, 3), true);
 //        return employeeRepository.findById(id).orElse(null);
         return employeeService.getEmployeeById(id);
