@@ -3,10 +3,15 @@ package com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.dto.EmployeeDTO;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.EmployeeEntity;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
+import org.apache.el.util.ReflectionUtil;
+import org.aspectj.util.Reflection;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,9 +56,31 @@ public class EmployeeService {
         return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
     }
 
-    public void deleteEmployeeById(Long employeeId) {
+    public boolean isExistsByEmployeeId(Long employeeId) {
+        return employeeRepository.existsById(employeeId);
+    }
+    public boolean deleteEmployeeById(Long employeeId) {
         // make sure no error occurs by writing try catch block
         // indication of got successfully, or not found, or hit api twice
+        boolean exists = isExistsByEmployeeId(employeeId);
+        if (!exists) return false;
         employeeRepository.deleteById(employeeId);
+        return true;
+    }
+
+    public EmployeeDTO updatePartialEmployeeById(Long employeeId, Map<String,Object> updates) {
+        //check if employee with that ID is present
+        boolean exists = isExistsByEmployeeId(employeeId);
+        if (!exists) return null;
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get() ; // try catch block to avoid errors
+        // now make updates as key values pairs, Concept of Reflection, Directly go to object and update the fields, Inverse way of doing
+        updates.forEach((field, value) -> {  // key is string, value is object
+            Field fieldToBeUpdated = ReflectionUtils.findRequiredField(EmployeeEntity.class, field);
+            fieldToBeUpdated.setAccessible(true);
+            ReflectionUtils.setField(fieldToBeUpdated, employeeEntity, value);
+            // for each update in updates, we are trying to find the field, and made it accessible so it can easily be updated, now updating the field inside employeeEntity object,
+            // with the value that is provided
+        });
+        return modelMapper.map(employeeRepository.save(employeeEntity), EmployeeDTO.class);
     }
 }

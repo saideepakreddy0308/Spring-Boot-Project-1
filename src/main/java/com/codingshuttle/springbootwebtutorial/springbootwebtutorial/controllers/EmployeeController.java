@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(path = "/employees")
@@ -46,20 +48,25 @@ public class EmployeeController {
 
 
     @PostMapping
-    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee){
+    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
         return employeeService.createNewEmployee(inputEmployee);
     }
 
     // all  the above three methods are confirming to the MVC architecture
 
     @PutMapping(path = "/{employeeId}")
-    public EmployeeDTO updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId){
+    public EmployeeDTO updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId) {
         return employeeService.updateEmployeeById(employeeId, employeeDTO);  // here, passing the employeeDTO to particular employeeId
     }
 
     @DeleteMapping(path = "/{employeeId}")
-    public void deleteEmployeeByID(@PathVariable Long employeeId){   // no need to return anything, void or boolean is best
-         employeeService.deleteEmployeeById(employeeId);  // no need of returning anything
+    public void deleteEmployeeByID(@PathVariable Long employeeId) {   // no need to return anything, void or boolean is best
+        employeeService.deleteEmployeeById(employeeId);  // no need of returning anything
+    }
 
-
-}
+    @PatchMapping(path = "/{employeeId}")// we cant go for employeeDTO as input, as we really dont know the fields to update.
+    // so we instead use a map of string to object
+    public EmployeeDTO updatePartialEmployeeByID (@RequestBody Map<String, Object> updates, @PathVariable Long employeeId){
+        return employeeService.updatePartialEmployeeById(employeeId, updates);  // here, passing the updates
+        }
+    }
