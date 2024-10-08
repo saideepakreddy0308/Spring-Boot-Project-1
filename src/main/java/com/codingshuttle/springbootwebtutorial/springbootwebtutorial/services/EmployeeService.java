@@ -28,8 +28,6 @@ public class EmployeeService {
 
     public List<EmployeeDTO> getAllEmployees() {
         List<EmployeeEntity> employeeEntities = employeeRepository.findAll();
-        // now we need to convert this list of employee entities to List of DTO
-        // we can use stream library
        return employeeEntities
                 .stream()
                 .map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class))
@@ -37,11 +35,25 @@ public class EmployeeService {
     }
 
     public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
-        // we know we would save it as EmployeeEntity
-        // we need to make sure that we are not saving the EmployeeDTo inputEmployee directly inside the repository
+        // to check if user is admin , perform logics
+        // log something, perform operations
         EmployeeEntity toSaveEntity = modelMapper.map(inputEmployee,EmployeeEntity.class);
         EmployeeEntity savedEmployeeEntity =  employeeRepository.save(toSaveEntity);
-        // now we need to return back the DTO
         return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
+    }
+
+    public EmployeeDTO updateEmployeeById(Long employeeId, EmployeeDTO employeeDTO) {
+        // if not present, throw exception, ask product manager
+        // can create new employee, with that DTO information, if present, then update
+        EmployeeEntity employeeEntity = modelMapper.map(employeeDTO, EmployeeEntity.class);
+        employeeEntity.setId(employeeId); // if he had not set so
+        EmployeeEntity savedEmployeeEntity = employeeRepository.save(employeeEntity);
+        return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
+    }
+
+    public void deleteEmployeeById(Long employeeId) {
+        // make sure no error occurs by writing try catch block
+        // indication of got successfully, or not found, or hit api twice
+        employeeRepository.deleteById(employeeId);
     }
 }

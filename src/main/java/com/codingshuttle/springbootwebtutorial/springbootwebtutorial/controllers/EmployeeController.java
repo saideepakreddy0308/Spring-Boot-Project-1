@@ -52,8 +52,14 @@ public class EmployeeController {
 
     // all  the above three methods are confirming to the MVC architecture
 
-    @PutMapping String updateEmployeeByID(){
-        return null;
+    @PutMapping(path = "/{employeeId}")
+    public EmployeeDTO updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId){
+        return employeeService.updateEmployeeById(employeeId, employeeDTO);  // here, passing the employeeDTO to particular employeeId
     }
+
+    @DeleteMapping(path = "/{employeeId}")
+    public void deleteEmployeeByID(@PathVariable Long employeeId){   // no need to return anything, void or boolean is best
+         employeeService.deleteEmployeeById(employeeId);  // no need of returning anything
+
 
 }
