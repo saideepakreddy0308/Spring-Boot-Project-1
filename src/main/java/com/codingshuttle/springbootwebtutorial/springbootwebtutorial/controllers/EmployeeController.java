@@ -35,11 +35,6 @@ public class EmployeeController {
                 .orElseThrow(() -> new NoSuchElementException("Employee not found"));
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleEmployeeNotFound(NoSuchElementException exception){
-        return new ResponseEntity<>("Employee not found", HttpStatus.NOT_FOUND);
-    } // now its shows 404, instead of 200 status ok.
-
     @GetMapping
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
         return ResponseEntity.ok(employeeService.getAllEmployees());
