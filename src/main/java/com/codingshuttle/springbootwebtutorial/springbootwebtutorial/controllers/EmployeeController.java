@@ -13,10 +13,7 @@ import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/employees")
@@ -35,7 +32,7 @@ public class EmployeeController {
         Optional<EmployeeDTO> employeeDTO =  employeeService.getEmployeeById(id);
         return employeeDTO
                 .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new NoSuchElementException("Employee not found"));
     }
 
     @GetMapping
@@ -43,6 +40,10 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
+    @ExceptionHandler(NoSuchElementException.class)
+    public String handleEmployeeNotFound(NoSuchElementException exception){
+        return "Employee was not found";
+    }
 
 
     @PostMapping
