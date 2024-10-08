@@ -4,6 +4,7 @@ import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.dto.Employe
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.EmployeeEntity;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services.EmployeeService;
+import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,21 +36,21 @@ public class EmployeeController {
 
     //    http://localhost:8080/employees?age=23
     @GetMapping
-    public List<EmployeeEntity> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
+    public List<EmployeeDTO> getAllEmployees(@RequestParam(required = false, name = "age") Integer inputAge, @RequestParam(required = false) String sortBy) {
 //        return "Hi age " + inputAge + "  " + sortBy;
 //        return employeeRepository.findAll();
         return employeeService.getAllEmployees();
     }
 
+    // we need to make sure in controller that we are not using EmployeeEntity
+
+
     @PostMapping
-    public EmployeeEntity createNewEmployee(@RequestBody EmployeeEntity inputEmployee){
-//        return "Hello from POST"  , STRING
-//        return null;   // Here not dealing with database
-//        inputEmployee.setId(100L);
-//        return inputEmployee;
-//        return employeeRepository.save(inputEmployee);
+    public EmployeeDTO createNewEmployee(@RequestBody EmployeeDTO inputEmployee){
         return employeeService.createNewEmployee(inputEmployee);
     }
+
+    // all  the above three methods are confirming to the MVC architecture
 
     @PutMapping String updateEmployeeByID(){
         return null;

@@ -7,34 +7,41 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final ModelMapper modelMapper;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
+        this.modelMapper = modelMapper;
     }
 
     public EmployeeDTO getEmployeeById(Long id) {
         EmployeeEntity employeeEntity =  employeeRepository.findById(id).orElse(null);
-        // how do I now convert my Entity now to DTO
-//        return new EmployeeDTO(EmployeeEntity.getId(), employeeEntity.getName(), employeeEntity.getEmail());
-//        this is how we can map the Entity to DTO, but this is not optimized
-        // Model mapper can be used here, so now the code after the above is
-        ModelMapper mapper = new ModelMapper();
-        mapper.map(employeeEntity, EmployeeDTO.class);
+        return modelMapper.map(employeeEntity, EmployeeDTO.class);
 
     }
 
-    public List<EmployeeDTO > getAllEmployees() {
-        // now here also we need to create an instance of model mapper, so this is not the spring way of doing.
-        // so we define bean of model mapper, in the AppConfig to ease the process.
-        return employeeRepository.findAll();
+    public List<EmployeeDTO> getAllEmployees() {
+        List<EmployeeEntity> employeeEntities = employeeRepository.findAll();
+        // now we need to convert this list of employee entities to List of DTO
+        // we can use stream library
+       return employeeEntities
+                .stream()
+                .map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class))
+                .collect(Collectors.toList());
     }
 
-    public EmployeeEntity createNewEmployee(EmployeeEntity inputEmployee) {
-        return employeeRepository.save(inputEmployee);
+    public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
+        // we know we would save it as EmployeeEntity
+        // we need to make sure that we are not saving the EmployeeDTo inputEmployee directly inside the repository
+        EmployeeEntity toSaveEntity = modelMapper.map(inputEmployee,EmployeeEntity.class);
+        EmployeeEntity savedEmployeeEntity =  employeeRepository.save(toSaveEntity);
+        // now we need to return back the DTO
+        return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
     }
 }
