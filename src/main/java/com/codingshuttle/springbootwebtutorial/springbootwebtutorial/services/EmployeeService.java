@@ -2,6 +2,7 @@ package com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services;
 
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.dto.EmployeeDTO;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.EmployeeEntity;
+import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.exceptions.ResourceNotFoundException;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import org.apache.el.util.ReflectionUtil;
 import org.aspectj.util.Reflection;
@@ -53,6 +54,8 @@ public class EmployeeService {
     public EmployeeDTO updateEmployeeById(Long employeeId, EmployeeDTO employeeDTO) {
         // if not present, throw exception, ask product manager
         // can create new employee, with that DTO information, if present, then update
+        boolean exists = isExistsByEmployeeId(employeeId);
+        if (!exists) throw new ResourceNotFoundException("Employee not found with if: " + employeeId);  // Here, if we observe, we can throw exceptions from our service as well
         EmployeeEntity employeeEntity = modelMapper.map(employeeDTO, EmployeeEntity.class);
         employeeEntity.setId(employeeId); // if he had not set so
         EmployeeEntity savedEmployeeEntity = employeeRepository.save(employeeEntity);

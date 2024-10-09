@@ -2,6 +2,7 @@ package com.codingshuttle.springbootwebtutorial.springbootwebtutorial.controller
 
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.dto.EmployeeDTO;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.entities.EmployeeEntity;
+import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.exceptions.ResourceNotFoundException;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.repositories.EmployeeRepository;
 import com.codingshuttle.springbootwebtutorial.springbootwebtutorial.services.EmployeeService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.ReadOnlyFileSystemException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -32,7 +34,7 @@ public class EmployeeController {
         Optional<EmployeeDTO> employeeDTO =  employeeService.getEmployeeById(id);
         return employeeDTO
                 .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
-                .orElseThrow(() -> new NoSuchElementException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with if: " + id));
     }
 
     @GetMapping
@@ -50,7 +52,7 @@ public class EmployeeController {
     @PutMapping(path = "/{employeeId}")
     public ResponseEntity<EmployeeDTO> updateEmployeeByID(@RequestBody EmployeeDTO employeeDTO, @PathVariable Long employeeId) {
         return ResponseEntity.ok(employeeService.updateEmployeeById(employeeId, employeeDTO));
-    }
+    }  // we can throw an exception if employee is not found, so lets get into the service and make an exception like above
 
     @DeleteMapping(path = "/{employeeId}")
     public ResponseEntity<Boolean> deleteEmployeeByID(@PathVariable Long employeeId) {
