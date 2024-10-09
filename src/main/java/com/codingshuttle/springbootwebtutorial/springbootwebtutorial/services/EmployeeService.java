@@ -69,7 +69,7 @@ public class EmployeeService {
         // make sure no error occurs by writing try catch block
         // indication of got successfully, or not found, or hit api twice
         boolean exists = isExistsByEmployeeId(employeeId);
-        if (!exists) return false;
+        if (!exists) throw new ResourceNotFoundException("Employee not found with id: " + employeeId);
         employeeRepository.deleteById(employeeId);
         return true;
     }
@@ -77,7 +77,7 @@ public class EmployeeService {
     public EmployeeDTO updatePartialEmployeeById(Long employeeId, Map<String,Object> updates) {
         //check if employee with that ID is present
         boolean exists = isExistsByEmployeeId(employeeId);
-        if (!exists) return null;
+        if (!exists) throw new ResourceNotFoundException("Employee not found with id: " + employeeId);
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId).get() ; // try catch block to avoid errors
         // now make updates as key values pairs, Concept of Reflection, Directly go to object and update the fields, Inverse way of doing
         updates.forEach((field, value) -> {  // key is string, value is object
